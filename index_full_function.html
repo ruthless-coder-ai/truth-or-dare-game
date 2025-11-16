@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>真心话大冒险小助手</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --primary: #6366f1;
+      --card-hover: #eef2ff;
+      --pill-bg: #eef2ff;
+      --pill-color: #4f46e5;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+
+    /* 朋友聚会版：紫蓝 */
+    body.theme-friends {
+      --bg: radial-gradient(circle at top, #e0e7ff, #f3f4f6);
+      --primary: #6366f1;
+      --card-hover: #e0e7ff;
+      --pill-bg: #e0e7ff;
+      --pill-color: #3730a3;
+    }
+
+    /* 情侣版：粉紫 */
+    body.theme-couple {
+      --bg: radial-gradient(circle at top, #fed7e2, #faf5ff);
+      --primary: #ec4899;
+      --card-hover: #fdf2f8;
+      --pill-bg: #fdf2f8;
+      --pill-color: #be185d;
+    }
+
+    /* 公司团建安全版：蓝青 */
+    body.theme-work {
+      --bg: radial-gradient(circle at top, #bae6fd, #ecfeff);
+      --primary: #0ea5e9;
+      --card-hover: #e0f2fe;
+      --pill-bg: #e0f2fe;
+      --pill-color: #0369a1;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 22px;
+    }
+    .card {
+      margin-top: 12px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+    }
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      background: var(--card-hover);
+    }
+    /* 抽题时的小动画 */
+    .card.animate {
+      animation: card-pop 0.25s ease-out;
+    }
+    @keyframes card-pop {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.4;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 4px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    }
+    button:active {
+      transform: scale(0.96);
+      box-shadow: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .btn-mode {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* 主页三个选项按钮的专属颜色 */
+.btn-friends {
+  background: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(99,102,241,0.35);
+}
+
+.btn-couple {
+  background: #ec4899;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(236,72,153,0.35);
+}
+
+.btn-work {
+  background: #0ea5e9;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(14,165,233,0.35);
+}
+
+/* 点下去有点反馈 */
+.btn-mode:active {
+  transform: scale(0.96);
+  box-shadow: none;
+}
+
+    .label {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+    .settings {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+      font-size: 12px;
+      color: #4b5563;
+    }
+    .settings-title {
+      font-weight: 600;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .settings-note {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    .mode-pill {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--pill-bg);
+      color: var(--pill-color);
+      font-size: 11px;
+    }
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    #backBtn {
+      padding: 4px 10px;
+      font-size: 12px;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- 音效：在同目录下放 truth.mp3 和 dare.mp3 -->
+  <audio id="truthSound" src="truth.mp3" preload="auto"></audio>
+  <audio id="dareSound" src="dare.mp3" preload="auto"></audio>
+
+  <!-- 模式选择界面 -->
+ 
+
+  <div class="container" id="modeScreen">
+    <h1>真心话大冒险 游戏助手 🎲</h1>
+    <p class="subtitle">先选择一个适合今天场景的模式</p>
+  
+    <button class="btn-mode btn-friends" data-theme="friends">
+      朋友聚会版 🎉
+    </button>
+    <button class="btn-mode btn-couple" data-theme="couple">
+      情侣版 💞
+    </button>
+    <button class="btn-mode btn-work" data-theme="work">
+      公司团建安全版 🧑‍💼
+    </button>
+  
+    <p class="settings-note" style="margin-top:10px;">
+    
+    </p>
+  </div>
+  
+  <!-- 游戏界面 -->
+  <div class="container" id="gameScreen" style="display:none;">
+    <div class="top-row">
+      <button id="backBtn" class="btn-secondary">← 返回</button>
+      <span class="mode-pill" id="themeLabel"></span>
+    </div>
+    <h1>真心话大冒险 游戏助手 🎲</h1>
+    <p class="subtitle">
+      选择题型，然后点击“抽一题”或点击卡片
+    </p>
+
+    <div class="label">
+      当前题型：<span id="currentType">随机</span>
+    </div>
+
+    <div>
+      <button class="btn-secondary" data-mode="truth">真心话</button>
+      <button class="btn-secondary" data-mode="dare">大冒险</button>
+      <button class="btn-secondary" data-mode="random">随机</button>
+    </div>
+
+    <div class="card" id="questionCard">
+      点击卡片或下面的按钮开始抽题！
+    </div>
+
+    <button id="nextBtn" class="btn-primary" style="margin-top: 10px;">抽一题</button>
+
+    <!-- 设置区 -->
+    <div class="settings">
+      <div class="settings-title">设置</div>
+      <div class="settings-row">
+        <input type="checkbox" id="soundToggle" checked />
+        <label for="soundToggle">开启音效</label>
+      </div>
+      <div class="settings-note">
+    
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 当前主题：friends / couple / work
+    let activeTheme = null;
+    let currentMode = "random"; // truth / dare / random
+    let remainingTruthIndices = [];
+    let remainingDareIndices = [];
+    let soundEnabled = true;
+
+    function getThemeLabel(theme) {
+      if (theme === "friends") return "朋友聚会版";
+      if (theme === "couple") return "情侣版";
+      if (theme === "work") return "公司团建版";
+      return "";
+    }
+
+    function applyTheme(theme) {
+      document.body.classList.remove("theme-friends", "theme-couple", "theme-work");
+      if (theme === "friends") document.body.classList.add("theme-friends");
+      if (theme === "couple") document.body.classList.add("theme-couple");
+      if (theme === "work") document.body.classList.add("theme-work");
+    }
+
+    // ——————————————————————————
+    // 题库：带 tags 标签 ["friends","couple","work"]
+    // ——————————————————————————
+    const truths = [
+      { text: "说一件你最近在烦恼的事情。", tags: ["friends","couple"] },
+      { text: "你做过最冲动的事是什么？", tags: ["friends","couple"] },
+      { text: "你最害怕失去的人是谁？", tags: ["friends","couple"] },
+      { text: "你人生中最想感谢的人是谁？", tags: ["friends","couple","work"] },
+      { text: "你有没有特别后悔过的一件事？", tags: ["friends","couple"] },
+      { text: "你最不能接受朋友的哪种行为？", tags: ["friends","couple","work"] },
+      { text: "有没有一件你一直放不下的事？", tags: ["friends","couple"] },
+      { text: "你认为自己最大的优点是什么？", tags: ["friends","couple","work"] },
+      { text: "你认为自己最大的缺点是什么？", tags: ["friends","couple","work"] },
+      { text: "你最想改掉的习惯是什么？", tags: ["friends","couple","work"] },
+      { text: "你有没有偷偷哭过？原因是什么？", tags: ["friends","couple"] },
+      { text: "你手机里最舍不得删的照片是什么？", tags: ["friends","couple","work"] },
+      { text: "你最近一次心动是什么时候？", tags: ["friends","couple"] },
+      { text: "你认为在座的人谁最可靠？", tags: ["friends","couple","work"] },
+      { text: "你做过最浪漫的事情是什么？", tags: ["friends","couple"] },
+      { text: "你做过最勇敢的一件事是什么？", tags: ["friends","couple","work"] },
+      { text: "你有没有暗恋过别人？持续多久？", tags: ["friends","couple"] },
+      { text: "你最讨厌别人给你贴的标签是什么？", tags: ["friends","couple","work"] },
+      { text: "说一个你特别想实现的梦想。", tags: ["friends","couple","work"] },
+      { text: "小时候你最丢脸的一件事是什么？", tags: ["friends","couple","work"] },
+      { text: "你最喜欢自己哪一点？", tags: ["friends","couple","work"] },
+      { text: "你觉得自己最特别的地方是什么？", tags: ["friends","couple","work"] },
+      { text: "最近一次大笑是因为什么？", tags: ["friends","couple","work"] },
+      { text: "你觉得友情和爱情哪个更重要？", tags: ["friends","couple"] },
+      { text: "你觉得“幸福”是什么？", tags: ["friends","couple","work"] },
+      { text: "有没有一首歌特别能代表你？", tags: ["friends","couple","work"] },
+      { text: "你最想改变世界的一件事是什么？", tags: ["friends","couple","work"] },
+      { text: "你想对未来自己说什么？", tags: ["friends","couple","work"] },
+      { text: "你和家人最温暖的回忆是什么？", tags: ["friends","couple","work"] },
+      { text: "你有没有被误会过？是什么事情？", tags: ["friends","couple","work"] },
+      { text: "你最害怕什么动物？为什么？", tags: ["friends","couple","work"] },
+      { text: "你有没有对某人说过谎？是什么？", tags: ["friends","couple"] },
+      { text: "你对“遗憾”最深的体验是什么？", tags: ["friends","couple"] },
+      { text: "有没有什么事让你彻底长大？", tags: ["friends","couple"] },
+      { text: "你曾经最想逃离的瞬间是什么？", tags: ["friends","couple"] },
+      { text: "你最欣赏的人是谁？为什么？", tags: ["friends","couple","work"] },
+      { text: "你人生中最幸运的一件事？", tags: ["friends","couple","work"] },
+      { text: "你想尝试但一直没做的事是什么？", tags: ["friends","couple","work"] },
+      { text: "你听过最感动的话是什么？", tags: ["friends","couple"] },
+      { text: "你最害怕的未来是什么？", tags: ["friends","couple"] },
+      { text: "说一个你对自己隐藏的期望。", tags: ["friends","couple","work"] },
+      { text: "你做过最幼稚的行为是什么？", tags: ["friends","couple","work"] },
+      { text: "如果明天是最后一天，你会做什么？", tags: ["friends","couple"] },
+      { text: "你有没有后悔认识某个人？", tags: ["friends","couple"] },
+      { text: "你觉得自己最真实的样子是什么？", tags: ["friends","couple","work"] },
+      { text: "哪部电影最能代表你的状态？", tags: ["friends","couple","work"] },
+      { text: "你曾经被谁治愈过？", tags: ["friends","couple"] },
+      { text: "说出你最怀念的一个瞬间。", tags: ["friends","couple","work"] },
+      { text: "你做过最值得骄傲的一件事是什么？", tags: ["friends","couple","work"] },
+      { text: "你现在最想改变的关系是什么？", tags: ["friends","couple"] },
+      { text: "你最想和谁和解？", tags: ["friends","couple"] },
+      { text: "说一个你觉得大家对你的误解。", tags: ["friends","couple","work"] },
+      { text: "你最讨厌的一句话是什么？", tags: ["friends","couple","work"] },
+      { text: "你对“离别”有什么体验？", tags: ["friends","couple"] },
+      { text: "你现在最想对谁说一句谢谢？", tags: ["friends","couple","work"] },
+      { text: "你曾经最不自信的瞬间是什么？", tags: ["friends","couple"] },
+      { text: "你觉得自己的使命是什么？", tags: ["friends","couple","work"] },
+      { text: "你有没有“装作没关系”的时候？", tags: ["friends","couple"] },
+      { text: "什么事能让你瞬间失落？", tags: ["friends","couple"] },
+      { text: "你最想永远保持的品质是什么？", tags: ["friends","couple","work"] },
+      { text: "有没有一瞬间让你觉得自己被爱？", tags: ["friends","couple"] },
+      { text: "你人生中最重要的价值是什么？", tags: ["friends","couple","work"] },
+      { text: "你最想忘掉的一件事是什么？", tags: ["friends","couple"] },
+      { text: "你觉得友情的底线是什么？", tags: ["friends","couple","work"] },
+      { text: "你有没有特别想弥补的人？", tags: ["friends","couple"] },
+      { text: "你做过最让自己感动的事是什么？", tags: ["friends","couple"] },
+      { text: "如果可以回到十年前你会做什么？", tags: ["friends","couple","work"] },
+      { text: "你最不想回忆的经历是什么？", tags: ["friends","couple"] },
+      { text: "你喜欢什么样的生活节奏？", tags: ["friends","couple","work"] },
+      { text: "你经历过最神奇的巧合是什么？", tags: ["friends","couple","work"] },
+      { text: "你最喜欢的节日是什么？为什么？", tags: ["friends","couple","work"] },
+      { text: "你觉得“安全感”来自什么？", tags: ["friends","couple","work"] },
+      { text: "你最近一次认真反省自己是什么时候？", tags: ["friends","couple","work"] },
+      { text: "你一直没说出口的愿望是什么？", tags: ["friends","couple"] },
+      { text: "你有没有被别人温柔以待过？", tags: ["friends","couple","work"] },
+      { text: "你最看重别人的什么品质？", tags: ["friends","couple","work"] },
+      { text: "你什么时候最像自己？", tags: ["friends","couple","work"] },
+      { text: "你心里的“完美一天”是什么样？", tags: ["friends","couple","work"] },
+      { text: "有什么事让你一提起就开心？", tags: ["friends","couple","work"] },
+      { text: "有没有一句话曾经救过你？", tags: ["friends","couple"] },
+      { text: "你人生中最想完成的清单是什么？", tags: ["friends","couple","work"] },
+      { text: "什么行为会让你瞬间好感暴涨？", tags: ["friends","couple","work"] },
+      { text: "你对“真正的朋友”的定义是什么？", tags: ["friends","couple","work"] },
+      { text: "你最不能容忍的行为是什么？", tags: ["friends","couple","work"] },
+      { text: "你最想尝试但需要勇气的事是什么？", tags: ["friends","couple"] },
+      { text: "有什么是你永远不会做的？", tags: ["friends","couple","work"] },
+      { text: "最近一次让你感到“被理解”是什么时候？", tags: ["friends","couple"] },
+      { text: "你认为最难忘的瞬间是什么？", tags: ["friends","couple","work"] },
+      { text: "有没有一个你想再见却不能见的人？", tags: ["friends","couple"] },
+      { text: "你最喜欢独处还是热闹？", tags: ["friends","couple","work"] },
+      { text: "如果只能留下一样东西，你选什么？", tags: ["friends","couple","work"] },
+      { text: "你最想对过去的自己说什么？", tags: ["friends","couple","work"] },
+      { text: "说一个你从来没告诉过别人的小愿望。", tags: ["friends","couple"] },
+      { text: "哪句话曾经伤害你最深？", tags: ["friends","couple"] },
+      { text: "你人生里最大的转折点是什么？", tags: ["friends","couple","work"] },
+      { text: "你最想对某个人说的一句话是什么？", tags: ["friends","couple"] },
+      { text: "你现在最珍惜的是什么？", tags: ["friends","couple","work"] },
+      { text: "你最喜欢别人怎么对待你？", tags: ["friends","couple","work"] },
+      { text: "你最近一次被“感动得很突然”是什么？", tags: ["friends","couple"] },
+      { text: "你觉得自己最真实的本质是什么？", tags: ["friends","couple","work"] }
+    ];
+
+    const dares = [
+      { text: "做一个最吸引人的 pose 持续 5 秒。", tags: ["friends","couple","work"] },
+      { text: "用一句广告词介绍自己。", tags: ["friends","couple","work"] },
+      { text: "学一种动物叫声，让大家猜是什么。", tags: ["friends","couple","work"] },
+      { text: "模仿现场某个人的动作 10 秒。", tags: ["friends","couple","work"] },
+      { text: "对右边的人夸三句真诚的赞美。", tags: ["friends","couple","work"] },
+      { text: "用方言说一句“我太开心了”。", tags: ["friends","couple","work"] },
+      { text: "用最浮夸的语气说：“我今天超帅/超美！”", tags: ["friends","couple","work"] },
+      { text: "做 10 秒钟机器人动作。", tags: ["friends","couple","work"] },
+      { text: "随机抽一个人，讲一个暖心小故事给他。", tags: ["friends","couple","work"] },
+      { text: "用 5 秒钟演一个“突然很惊讶”的情绪。", tags: ["friends","couple","work"] },
+      { text: "模仿一个你最熟悉的朋友 5 秒。", tags: ["friends","couple","work"] },
+      { text: "随机选一个人，对他说一句鼓励的话。", tags: ["friends","couple","work"] },
+      { text: "做一个你童年常做的搞怪动作。", tags: ["friends","couple","work"] },
+      { text: "展示你手机里最可爱的表情包。", tags: ["friends","couple"] },
+      { text: "在空中画一个心形。", tags: ["friends","couple","work"] },
+      { text: "模仿新闻播报 10 秒。", tags: ["friends","couple","work"] },
+      { text: "对一位玩家说一句“谢谢你”。要真诚。", tags: ["friends","couple","work"] },
+      { text: "把你的昵称重新取一个搞笑版本。", tags: ["friends","couple","work"] },
+      { text: "表演你最夸张的走路方式。", tags: ["friends","couple","work"] },
+      { text: "说出你最近学到的一件小知识。", tags: ["friends","couple","work"] },
+      { text: "做一个“不敢相信”的表情 5 秒。", tags: ["friends","couple","work"] },
+      { text: "做一个你认为最可爱的动作。", tags: ["friends","couple","work"] },
+      { text: "用手比出一个“奇怪的造型”。", tags: ["friends","couple","work"] },
+      { text: "用一句话安慰所有玩家。", tags: ["friends","couple","work"] },
+      { text: "给自己取一个“反差萌”的外号。", tags: ["friends","couple","work"] },
+      { text: "分享一个你最近发现的好东西（不露脸）。", tags: ["friends","couple","work"] },
+      { text: "做一个“我是主角”的姿势。", tags: ["friends","couple","work"] },
+      { text: "学一个游戏角色的动作。", tags: ["friends","couple","work"] },
+      { text: "说一句“我今天状态满分！”要很坚定。", tags: ["friends","couple","work"] },
+      { text: "用反派口吻说一句话。", tags: ["friends","couple","work"] },
+      { text: "给在座每个人一句小祝福。", tags: ["friends","couple","work"] },
+      { text: "一句话模仿一部电视剧台词。", tags: ["friends","couple","work"] },
+      { text: "做一个庆祝动作（像胜利一样）。", tags: ["friends","couple","work"] },
+      { text: "做一个“我刚起床”的表情。", tags: ["friends","couple","work"] },
+      { text: "模仿你最喜欢的动物走路。", tags: ["friends","couple","work"] },
+      { text: "用你的手比划一个奇怪但可爱的形状。", tags: ["friends","couple","work"] },
+      { text: "做 3 个不同的表情：开心、惊讶、疑惑。", tags: ["friends","couple","work"] },
+      { text: "用 5 秒钟讲述一个“假的人生故事”。", tags: ["friends","couple","work"] },
+      { text: "用你最温柔的声音说一句话。", tags: ["friends","couple","work"] },
+      { text: "模仿一个你喜欢的 emoji。", tags: ["friends","couple","work"] },
+      { text: "演一个“突然发现自己的作业没做”的反应。", tags: ["friends","couple","work"] },
+      { text: "模仿一个 cartoon 角色。", tags: ["friends","couple","work"] },
+      { text: "做一个“跳舞动作”（不需要跳，只做动作）。", tags: ["friends","couple","work"] },
+      { text: "假装自己是一个 NPC，重复一句话 5 秒。", tags: ["friends","couple","work"] },
+      { text: "讲一个温暖的笑话（不冷的那种）。", tags: ["friends","couple","work"] },
+      { text: "用你的双手做一个特别的形状送给大家。", tags: ["friends","couple","work"] },
+      { text: "假装在发布会介绍自己。", tags: ["friends","couple","work"] },
+      { text: "说出今天让你最放松的一件事。", tags: ["friends","couple","work"] },
+      { text: "做一个“超级英雄”动作。", tags: ["friends","couple","work"] },
+      { text: "把你的微信头像解释一下。", tags: ["friends","couple","work"] },
+      { text: "模仿小孩讲故事 10 秒。", tags: ["friends","couple","work"] },
+      { text: "展示你手机里最有趣的壁纸（可遮隐私）。", tags: ["friends","couple"] },
+      { text: "用一句假英文说一句假装很厉害的话。", tags: ["friends","couple","work"] },
+      { text: "做一个“变形金刚”的姿势。", tags: ["friends","couple","work"] },
+      { text: "模仿一种交通工具前进。", tags: ["friends","couple","work"] },
+      { text: "分享一个你童年的小回忆。", tags: ["friends","couple","work"] },
+      { text: "向空气比一个大心。", tags: ["friends","couple","work"] },
+      { text: "摆一个“我要上电视”的造型。", tags: ["friends","couple","work"] },
+      { text: "说一句你最近听过最好笑的段子。", tags: ["friends","couple","work"] },
+      { text: "用一句话总结你的今天。", tags: ["friends","couple","work"] },
+      { text: "假装被突然吓一跳。", tags: ["friends","couple","work"] },
+      { text: "做一个你最帅气/最漂亮的自拍动作。", tags: ["friends","couple"] },
+      { text: "模仿你见过的最奇怪的走姿。", tags: ["friends","couple","work"] },
+      { text: "用 10 秒讲一段超夸张的人生经历（假的）。", tags: ["friends","couple","work"] },
+      { text: "假装你是一只猫。", tags: ["friends","couple","work"] },
+      { text: "做一个“我好无语”的表情。", tags: ["friends","couple","work"] },
+      { text: "说一句“我相信我自己！”用最勇敢的语气。", tags: ["friends","couple","work"] },
+      { text: "模仿 DJ 手势 5 秒。", tags: ["friends","couple","work"] },
+      { text: "做一个“微笑到极致”的表情。", tags: ["friends","couple","work"] },
+      { text: "模仿一个你印象深刻的动画角色动作。", tags: ["friends","couple","work"] },
+      { text: "用一句话感谢一位玩家出现在你的生活里。", tags: ["friends","couple","work"] },
+      { text: "随机给一个玩家取一个绰号（温柔的）。", tags: ["friends","couple","work"] },
+      { text: "模仿运动员进场动作。", tags: ["friends","couple","work"] },
+      { text: "做一个“我突然懂了”的表情。", tags: ["friends","couple","work"] },
+      { text: "用最慢的语气说一句话。", tags: ["friends","couple","work"] },
+      { text: "做一个“我特别激动”的动作。", tags: ["friends","couple","work"] },
+      { text: "假装你在拍一个 vlog。", tags: ["friends","couple","work"] },
+      { text: "模仿快进动作（动作很快）。", tags: ["friends","couple","work"] },
+      { text: "用最夸张的语调说一句“好耶！”", tags: ["friends","couple","work"] },
+      { text: "模仿你看到过的最奇怪的手势舞动作。", tags: ["friends","couple","work"] },
+      { text: "做一个 3 秒微表情切换挑战。", tags: ["friends","couple","work"] },
+      { text: "用 5 秒讲一个超级简短故事。", tags: ["friends","couple","work"] },
+      { text: "做一个你从未做过的随机姿势。", tags: ["friends","couple","work"] },
+      { text: "模仿一只正在睡觉的动物。", tags: ["friends","couple","work"] },
+      { text: "做一个“强迫自己冷静”的深呼吸动作。", tags: ["friends","couple","work"] },
+      { text: "给自己来一句“加油语录”。", tags: ["friends","couple","work"] },
+      { text: "用手指演一个迷你戏剧。", tags: ["friends","couple","work"] },
+      { text: "做一个“今天我很幸福”的姿势。", tags: ["friends","couple","work"] },
+      { text: "模仿你喜欢的游戏攻击动作。", tags: ["friends","couple","work"] },
+      { text: "做一个“我什么都不知道”的表情。", tags: ["friends","couple","work"] },
+      { text: "用你最搞笑的语气说一句“请多指教”。", tags: ["friends","couple","work"] },
+      { text: "做出一个你认为最可爱的姿势。", tags: ["friends","couple","work"] },
+      { text: "模仿你最喜欢的美食广告风格。", tags: ["friends","couple","work"] },
+      { text: "展示你手机里最喜欢的一句文字（避免隐私）。", tags: ["friends","couple","work"] },
+      { text: "模仿一个你常见的 NPC 行为。", tags: ["friends","couple","work"] },
+      { text: "做一个“力量爆发”的动作。", tags: ["friends","couple","work"] },
+      { text: "用搞怪语气说一句“我准备好了！”", tags: ["friends","couple","work"] },
+      { text: "做一个“情绪 3 连击”动作。", tags: ["friends","couple","work"] },
+      { text: "模仿一个“看到喜欢的人时的反应”。", tags: ["friends","couple"] },
+      { text: "说一句对未来自己的鼓励。", tags: ["friends","couple","work"] }
+    ];
+
+    // ——————————————————————————
+    // 题目池 & 不重复抽题逻辑
+    // ——————————————————————————
+    function resetTruthPool() {
+      remainingTruthIndices = truths
+        .map((q, i) => ({ q, i }))
+        .filter(item => !activeTheme || item.q.tags.includes(activeTheme))
+        .map(item => item.i);
+    }
+
+    function resetDarePool() {
+      remainingDareIndices = dares
+        .map((q, i) => ({ q, i }))
+        .filter(item => !activeTheme || item.q.tags.includes(activeTheme))
+        .map(item => item.i);
+    }
+
+    function getFromPool(type) {
+      let pool, resetFn, arr;
+      if (type === "truth") {
+        pool = remainingTruthIndices;
+        resetFn = resetTruthPool;
+        arr = truths;
+      } else {
+        pool = remainingDareIndices;
+        resetFn = resetDarePool;
+        arr = dares;
+      }
+
+      if (pool.length === 0) {
+        resetFn();
+      }
+
+      if (pool.length === 0) {
+        const fallbackArr = (type === "truth" ? truths : dares);
+        const idx = Math.floor(Math.random() * fallbackArr.length);
+        return fallbackArr[idx].text;
+      }
+
+      const randIdxInPool = Math.floor(Math.random() * pool.length);
+      const questionIndex = pool[randIdxInPool];
+      pool.splice(randIdxInPool, 1);
+      return arr[questionIndex].text;
+    }
+
+    // ——————————————————————————
+    // 音效 & 动画
+    // ——————————————————————————
+    function playSound(typeLabel) {
+      if (!soundEnabled) return;
+
+      let audioId = null;
+      if (typeLabel === "真心话") audioId = "truthSound";
+      if (typeLabel === "大冒险") audioId = "dareSound";
+      if (!audioId) return;
+
+      const audio = document.getElementById(audioId);
+      if (!audio) return;
+      try {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      } catch (e) {}
+    }
+
+    function animateCard() {
+      const card = document.getElementById("questionCard");
+      if (!card) return;
+      card.classList.remove("animate");
+      void card.offsetWidth;
+      card.classList.add("animate");
+    }
+
+    function drawQuestion() {
+      let text = "";
+      let typeLabel = "";
+
+      if (currentMode === "truth") {
+        text = getFromPool("truth");
+        typeLabel = "真心话";
+      } else if (currentMode === "dare") {
+        text = getFromPool("dare");
+        typeLabel = "大冒险";
+      } else {
+        const isTruth = Math.random() < 0.5;
+        if (isTruth) {
+          text = getFromPool("truth");
+          typeLabel = "真心话";
+        } else {
+          text = getFromPool("dare");
+          typeLabel = "大冒险";
+        }
+      }
+
+      document.getElementById("questionCard").textContent = text;
+      document.getElementById("currentType").textContent = typeLabel || "随机";
+
+      playSound(typeLabel);
+      animateCard();
+    }
+
+    // ——————————————————————————
+    // UI 绑定：模式选择界面
+    // ——————————————————————————
+    const modeScreen = document.getElementById("modeScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const themeLabelSpan = document.getElementById("themeLabel");
+
+    const themeButtons = document.querySelectorAll("#modeScreen .btn-mode");
+    themeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeTheme = btn.getAttribute("data-theme");
+
+        applyTheme(activeTheme);
+        resetTruthPool();
+        resetDarePool();
+
+        themeLabelSpan.textContent = getThemeLabel(activeTheme);
+
+        modeScreen.style.display = "none";
+        gameScreen.style.display = "block";
+
+        // 初始化显示
+        currentMode = "random";
+        document.getElementById("currentType").textContent = "随机";
+        drawQuestion();
+      });
+    });
+
+    // 返回按钮：回到模式选择界面
+    document.getElementById("backBtn").addEventListener("click", () => {
+      gameScreen.style.display = "none";
+      modeScreen.style.display = "block";
+
+      // 清除主题和状态
+      activeTheme = null;
+      document.body.classList.remove("theme-friends", "theme-couple", "theme-work");
+      themeLabelSpan.textContent = "";
+      currentMode = "random";
+      document.getElementById("currentType").textContent = "随机";
+      document.getElementById("questionCard").textContent = "点击卡片或下面的按钮开始抽题！";
+
+      // 重置题库池为“未选择主题”状态（其实用不到，但保持干净）
+      resetTruthPool();
+      resetDarePool();
+    });
+
+    // ——————————————————————————
+    // 游戏界面事件
+    // ——————————————————————————
+    const modeButtons = document.querySelectorAll("#gameScreen button[data-mode]");
+    modeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentMode = btn.getAttribute("data-mode");
+
+        const currentTypeSpan = document.getElementById("currentType");
+        if (currentMode === "truth") currentTypeSpan.textContent = "真心话";
+        else if (currentMode === "dare") currentTypeSpan.textContent = "大冒险";
+        else currentTypeSpan.textContent = "随机";
+
+        drawQuestion();
+      });
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", drawQuestion);
+    document.getElementById("questionCard").addEventListener("click", drawQuestion);
+
+    const soundToggle = document.getElementById("soundToggle");
+    soundToggle.addEventListener("change", () => {
+      soundEnabled = soundToggle.checked;
+    });
+  </script>
+</body>
+</html>
